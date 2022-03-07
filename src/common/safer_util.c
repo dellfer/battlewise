@@ -26,6 +26,7 @@
 #include "bdefs.h"
 #include "btypes.h"
 #include "berrors.h"
+#include "bmacros.h"
 #include "safer_util.h"
 
 #include <stdarg.h>
@@ -38,6 +39,8 @@
 EXTERN STATUS
 SAFER_UTIL_snprintf(sbyte *pStr, sbyte4 strSize, sbyte4 *pRetSize, const sbyte *pFormat, ...)
 {
+    /* Episode II: The snprintf!#@% Strikes Back */
+    /* Truncated snprintf() abuse */
     va_list args;
     int     result;
     STATUS  status;
@@ -72,11 +75,51 @@ SAFER_UTIL_snprintf(sbyte *pStr, sbyte4 strSize, sbyte4 *pRetSize, const sbyte *
 
 exit:
     if (OK > status)
-        memset(pStr, 0x00, strSize); 	/* on error, return an empty string */
+        memset(pStr, 0x00, strSize);    /* on error, return an empty string */
 
     if (NULL != pRetSize)
-        *pRetSize = strlen(pStr);		/* return actual length */
+        *pRetSize = strlen(pStr);       /* return actual length */
 
     return status;
 
 } /* SAFER_UTIL_snprintf */
+
+
+/*------------------------------------------------------------------------*/
+
+EXTERN STATUS
+SAFER_UTIL_xorBuf(void *pDstMem, const sbyte4 dstLen, 
+                 const void *pXorSrcMem, const sbyte4 xorSrcLen)
+{
+    /* Episode III: Entropy of the Clones */
+    /* Useful function for merging noise sources */
+    ubyte*          pDst = pDstMem;
+    const ubyte*    pSrc = pXorSrcMem;
+    sbyte4          index = 0;
+    sbyte4          length;
+    STATUS          status = OK;
+
+    if ((0 >= dstLen) || (0 >= xorSrcLen))
+    {
+        status = ERR_GEN_BAD_LENGTH;
+        goto exit;
+    }
+
+    if ((NULL == pDstMem) || (NULL == pXorSrcMem))
+    {
+        status = ERR_GEN_NULL_PTR;
+        goto exit;
+    }
+
+    length = BMAX(dstLen, xorSrcLen);
+
+    while (length > index)
+    {
+        pDst[index % dstLen] ^= pSrc[index % xorSrcLen];
+        index++;
+    }
+
+exit:
+    return status;
+
+} /* SAFER_UTIL_xorBuf */
