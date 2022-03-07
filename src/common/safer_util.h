@@ -25,6 +25,7 @@
 
 /*------------------------------------------------------------------------*/
 
-extern STATUS SAFER_UTIL_snprintf(sbyte *pStr, sbyte4 strSize, sbyte4 *pRetSize, const sbyte *pFormat, ...);
+EXTERN STATUS SAFER_UTIL_snprintf(sbyte *pStr, sbyte4 strSize, sbyte4 *pRetSize, const sbyte *pFormat, ...);
+EXTERN STATUS SAFER_UTIL_xorBuf(void *pDstMem, const sbyte4 dstLen, const void *pXorSrcMem, const sbyte4 xorSrcLen);
 
 #endif /* SAFER_UTIL_H */
