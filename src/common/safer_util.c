@@ -123,3 +123,59 @@ exit:
     return status;
 
 } /* SAFER_UTIL_xorBuf */
+
+
+/*------------------------------------------------------------------------*/
+
+EXTERN STATUS
+SAFER_UTIL_memMatch(const void *pMem1, const void *pMem2,
+                   const sbyte4 length, const sbyte4 extra_work,
+                   bool32 *pRetIsMatch)
+{
+    /* Episode IV: The Phantom Timer */
+    /* Useful function for throwing off timing attacks */
+    const ubyte*    p1 = pMem1;
+    const ubyte*    p2 = pMem2;
+    bool32          result = TRUE;
+    sbyte4          index = 0;
+    sbyte4          count = 0;
+    STATUS          status = OK;
+
+    if (0 >= length)
+    {
+        status = ERR_GEN_BAD_LENGTH;
+        goto exit;
+    }
+
+    if ((NULL == pMem1) || (NULL == pMem2) || (NULL == pRetIsMatch))
+    {
+        status = ERR_GEN_NULL_PTR;
+        goto exit;
+    }
+
+    *pRetIsMatch = FALSE;
+
+    while (length > count)
+    {
+        result &= (p1[index] == p2[index]);
+        index = (index + 1) % length;
+        count++;
+    }
+
+    /* extra work */
+    count = index = 0;
+
+    while (extra_work > count)
+    {
+        result &= (p1[index] == p2[index]);
+        index = (index + 1) % length;
+        count++;
+    }
+
+    *pRetIsMatch = result ? TRUE : FALSE;
+    status = OK;
+
+exit:
+    return status;
+
+} /* SAFER_UTIL_memMatch */
